@@ -1,0 +1,313 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Lab01_03
+{
+    // Lớp cơ sở Person
+    internal class Person
+    {
+        protected string id;
+        protected string fullName;
+
+        public string ID { get => id; set => id = value; }
+        public string FullName { get => fullName; set => fullName = value; }
+
+        public Person() { }
+
+        public Person(string id, string fullName)
+        {
+            this.id = id;
+            this.fullName = fullName;
+        }
+
+        public virtual void Input()
+        {
+            Console.Write("Nhập mã số: ");
+            ID = Console.ReadLine();
+            Console.Write("Nhập họ tên: ");
+            FullName = Console.ReadLine();
+        }
+
+        public virtual void Show()
+        {
+            Console.Write($"Mã số: {ID}; Họ tên: {FullName}");
+        }
+    }
+
+    // Lớp Student kế thừa Person
+    internal class Student : Person
+    {
+        private float averageScore;
+        private string faculty;
+
+        public float AverageScore { get => averageScore; set => averageScore = value; }
+        public string Faculty { get => faculty; set => faculty = value; }
+
+        public Student() : base() { }
+
+        public Student(string id, string fullName, float averageScore, string faculty)
+            : base(id, fullName)
+        {
+            this.averageScore = averageScore;
+            this.faculty = faculty;
+        }
+
+        public override void Input()
+        {
+            base.Input();
+
+            // Xử lý nhập điểm trung bình an toàn
+            while (true)
+            {
+                Console.Write("Nhập điểm trung bình: ");
+                if (float.TryParse(Console.ReadLine(), out float score) && score >= 0 && score <= 10)
+                {
+                    AverageScore = score;
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Điểm trung bình phải là số thực từ 0 đến 10, vui lòng nhập lại!");
+                }
+            }
+
+            Console.Write("Nhập khoa: ");
+            Faculty = Console.ReadLine();
+        }
+
+        public override void Show()
+        {
+            base.Show();
+            Console.WriteLine($"; Điểm trung bình: {AverageScore}; Khoa: {Faculty}");
+        }
+    }
+
+    // Lớp Teacher kế thừa Person
+    internal class Teacher : Person
+    {
+        private string address;
+
+        public string Address { get => address; set => address = value; }
+
+        public Teacher() : base() { }
+
+        public Teacher(string id, string fullName, string address) : base(id, fullName)
+        {
+            this.address = address;
+        }
+
+        public override void Input()
+        {
+            base.Input();
+            Console.Write("Nhập địa chỉ: ");
+            Address = Console.ReadLine();
+        }
+
+        public override void Show()
+        {
+            base.Show();
+            Console.WriteLine($"; Địa chỉ: {Address}");
+        }
+    }
+
+    // Đưa Program vào trong cùng namespace
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            List<Student> students = new List<Student>();
+            List<Teacher> teachers = new List<Teacher>();
+
+            bool exit = false;
+            while (!exit)
+            {
+                Console.WriteLine("=== MENU ===");
+                Console.WriteLine("1- Thêm sinh viên");
+                Console.WriteLine("2- Thêm giáo viên");
+                Console.WriteLine("3- Xuất danh sách sinh viên");
+                Console.WriteLine("4- Xuất danh sách giáo viên");
+                Console.WriteLine("5- Số lượng từng danh sách");
+                Console.WriteLine("6- Xuất danh sách các sinh viên thuộc khoa CNTT");
+                Console.WriteLine("7- Xuất danh sách giáo viên có địa chỉ chứa 'Quận 9'");
+                Console.WriteLine("8- Xuất danh sách sinh viên có điểm trung bình cao nhất thuộc khoa CNTT");
+                Console.WriteLine("9- Số lượng sinh viên theo xếp loại");
+                Console.WriteLine("0- Thoát");
+                Console.Write("Chọn chức năng (0-9): ");
+
+                string choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        AddStudent(students);
+                        break;
+                    case "2":
+                        AddTeacher(teachers);
+                        break;
+                    case "3":
+                        DisplayStudents(students);
+                        break;
+                    case "4":
+                        DisplayTeachers(teachers);
+                        break;
+                    case "5":
+                        DisplayCounts(students, teachers);
+                        break;
+                    case "6":
+                        DisplayStudentsByFaculty(students, "CNTT");
+                        break;
+                    case "7":
+                        DisplayTeachersByAddress(teachers, "Quận 9");
+                        break;
+                    case "8":
+                        DisplayTopStudentByFaculty(students, "CNTT");
+                        break;
+                    case "9":
+                        DisplayStudentClassificationCount(students);
+                        break;
+                    case "0":
+                        exit = true;
+                        Console.WriteLine("Kết thúc chương trình.");
+                        break;
+                    default:
+                        Console.WriteLine("Lựa chọn không hợp lệ, vui lòng thử lại.");
+                        break;
+                }
+                Console.WriteLine();
+            }
+        }
+
+        static void AddStudent(List<Student> students)
+        {
+            Console.WriteLine("--- Thêm sinh viên ---");
+            Student student = new Student();
+            student.Input();
+            students.Add(student);
+            Console.WriteLine("Thêm sinh viên thành công!");
+        }
+
+        static void AddTeacher(List<Teacher> teachers)
+        {
+            Console.WriteLine("--- Thêm giáo viên ---");
+            Teacher teacher = new Teacher();
+            teacher.Input();
+            teachers.Add(teacher);
+            Console.WriteLine("Thêm giáo viên thành công!");
+        }
+
+        static void DisplayStudents(List<Student> students)
+        {
+            Console.WriteLine("--- Danh sách sinh viên ---");
+            if (students.Count == 0)
+            {
+                Console.WriteLine("Danh sách sinh viên trống.");
+                return;
+            }
+            foreach (var student in students)
+            {
+                student.Show();
+            }
+        }
+
+        static void DisplayTeachers(List<Teacher> teachers)
+        {
+            Console.WriteLine("--- Danh sách giáo viên ---");
+            if (teachers.Count == 0)
+            {
+                Console.WriteLine("Danh sách giáo viên trống.");
+                return;
+            }
+            foreach (var teacher in teachers)
+            {
+                teacher.Show();
+            }
+        }
+
+        static void DisplayCounts(List<Student> students, List<Teacher> teachers)
+        {
+            Console.WriteLine("Tổng số sinh viên: {students.Count}");
+            Console.WriteLine("Tổng số giáo viên: {teachers.Count}");
+        }
+
+        static void DisplayStudentsByFaculty(List<Student> students, string faculty)
+        {
+            Console.WriteLine("--- Sinh viên thuộc khoa {faculty} ---");
+            var filtered = students.Where(s => s.Faculty.Equals(faculty, StringComparison.OrdinalIgnoreCase)).ToList();
+            if (filtered.Count == 0)
+            {
+                Console.WriteLine("Không có sinh viên thuộc khoa {faculty}.");
+                return;
+            }
+            foreach (var s in filtered)
+                s.Show();
+        }
+
+        static void DisplayTeachersByAddress(List<Teacher> teachers, string addressKeyword)
+        {
+            Console.WriteLine("--- Giáo viên có địa chỉ chứa '{addressKeyword}' ---");
+            var filtered = teachers.Where(t => t.Address.IndexOf(addressKeyword, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
+            if (filtered.Count == 0)
+            {
+                Console.WriteLine("Không có giáo viên có địa chỉ chứa '{addressKeyword}'.");
+                return;
+            }
+            foreach (var t in filtered)
+                t.Show();
+        }
+
+        static void DisplayTopStudentByFaculty(List<Student> students, string faculty)
+        {
+            Console.WriteLine("--- Sinh viên có điểm trung bình cao nhất thuộc khoa {faculty} ---");
+            var filtered = students.Where(s => s.Faculty.Equals(faculty, StringComparison.OrdinalIgnoreCase));
+            if (!filtered.Any())
+            {
+                Console.WriteLine("Không có sinh viên thuộc khoa {faculty}.");
+                return;
+            }
+            float maxScore = filtered.Max(s => s.AverageScore);
+            var topStudents = filtered.Where(s => s.AverageScore == maxScore);
+            foreach (var s in topStudents)
+                s.Show();
+        }
+
+        static void DisplayStudentClassificationCount(List<Student> students)
+        {
+            Console.WriteLine("--- Số lượng sinh viên theo xếp loại ---");
+            if (students.Count == 0)
+            {
+                Console.WriteLine("Danh sách sinh viên trống.");
+                return;
+            }
+
+            var classificationGroups = new Dictionary<string, int>()
+            {
+                { "Yếu (<5)", 0 },
+                { "Trung bình (5-6.5)", 0 },
+                { "Khá (6.5-7.5)", 0 },
+                { "Giỏi (7.5-9)", 0 },
+                { "Xuất sắc (>=9)", 0 }
+            };
+
+            foreach (var s in students)
+            {
+                if (s.AverageScore < 5)
+                    classificationGroups["Yếu (<5)"]++;
+                else if (s.AverageScore < 6.5)
+                    classificationGroups["Trung bình (5-6.5)"]++;
+                else if (s.AverageScore < 7.5)
+                    classificationGroups["Khá (6.5-7.5)"]++;
+                else if (s.AverageScore < 9)
+                    classificationGroups["Giỏi (7.5-9)"]++;
+                else
+                    classificationGroups["Xuất sắc (>=9)"]++;
+            }
+
+            foreach (var group in classificationGroups)
+            {
+                Console.WriteLine($"{group.Key}: {group.Value} sinh viên");
+            }
+        }
+    }
+}
